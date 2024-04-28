@@ -12,7 +12,6 @@ function getDefaultLogger(serviceName) {
   const DEBUG = process.env.DEBUG || 'false';
   const USE_JSON_LOGGER = process.env.USE_JSON_LOGGER || 'false';
   const nodeEnv = process.env.NODE_ENV || 'production';
-
   if (USE_JSON_LOGGER === 'true') {
     consoleFormat = combine(
       ms(),

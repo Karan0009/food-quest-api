@@ -7,9 +7,8 @@ import { ApiLoggerInterceptor } from './utils/logger/api-logger/api-logger/api-l
 async function bootstrap() {
   const port = process.env.PORT || 3000;
   const app = await NestFactory.create(AppModule, {
-    bufferLogs: true,
+    bufferLogs: false,
   });
-
   app.useLogger(LoggerFactory.logger);
   app.useGlobalInterceptors(new ApiLoggerInterceptor());
   app.use(compression());

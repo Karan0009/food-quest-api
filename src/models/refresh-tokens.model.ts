@@ -6,10 +6,10 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { User } from './user.model';
+import User from './user.model';
 
 @Table
-export class RefreshToken extends Model<RefreshToken> {
+export default class RefreshToken extends Model<RefreshToken> {
   @Column({
     field: 'id',
     type: DataType.UUID,

@@ -13,9 +13,6 @@ import { ConstantsModule } from './utils/constants/constants.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/static/',
@@ -23,10 +20,16 @@ import { ConstantsModule } from './utils/constants/constants.module';
         cacheControl: true,
       },
     }),
-    CustomSequelizeModule,
+
     UserModule,
     JwtModule,
+    ConfigModule.forRoot({
+      cache: false,
+      envFilePath: join(__dirname, '../', '.env'),
+      isGlobal: true,
+    }),
     ConstantsModule,
+    CustomSequelizeModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],

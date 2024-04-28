@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Request, Response } from 'express';
+import { v1 as uuidv1 } from 'uuid';
 
 @Injectable()
 export class ApiLoggerInterceptor implements NestInterceptor {
@@ -15,6 +16,7 @@ export class ApiLoggerInterceptor implements NestInterceptor {
     const request = httpContext.getRequest<Request>();
     const response = httpContext.getResponse<Response>();
 
+    request.requestId = uuidv1();
     const start = Date.now();
 
     response.on('finish', () => {
@@ -25,16 +27,23 @@ export class ApiLoggerInterceptor implements NestInterceptor {
       const timeTaken = Date.now() - start;
       request.ipAddr = request.ip.split(':').pop() || '';
 
-      const logMsg = `[${
-        request.ipAddr || 'UNKNOWN_IP'
-      }] [${method}] ${originalUrl} ${statusCode} ${contentLength} ${timeTaken}ms`;
+      // const logMsg = `[${
+      //   request.ipAddr || 'UNKNOWN_IP'
+      // }] [${method}] ${originalUrl} ${statusCode} ${contentLength} ${timeTaken}ms`;
+      const logMsg = {
+        ipAddr: request.ipAddr || 'UNKNOWN_IP',
+        method,
+        originalUrl,
+        statusCode,
+        contentLength,
+        timeTaken: `${timeTaken}ms`,
+        requestId: request.requestId,
+      };
 
-      if (statusCode >= 300) {
-        Logger.error(logMsg);
-      } else if (statusCode < 300 && statusCode >= 200) {
-        Logger.warn(logMsg);
+      if (statusCode < 400) {
+        Logger.log(logMsg);
       } else {
-        Logger.debug(logMsg);
+        Logger.error(logMsg);
       }
     });
 

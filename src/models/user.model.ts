@@ -1,8 +1,8 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
-import { RefreshToken } from './refresh-tokens.model';
+import RefreshToken from './refresh-tokens.model';
 
 @Table
-export class User extends Model<User> {
+export default class User extends Model<User> {
   @Column({
     field: 'id',
     type: DataType.UUID,
