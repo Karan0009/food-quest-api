@@ -4,7 +4,14 @@ import {
   utilities as nestWinstonModuleUtilities,
 } from 'nest-winston';
 
-const { combine, ms, timestamp, json, errors, label, colorize } = format;
+const { combine, ms, timestamp, json, errors, colorize, prettyPrint } = format;
+
+// function requestIdFormatter(info: any, opts: { req?: Request }) {
+//   if (opts.req && opts.req.requestId) {
+//     info.requestId = opts.req.requestId;
+//   }
+//   return info;
+// }
 
 function getDefaultLogger(serviceName) {
   let consoleFormat;
@@ -17,6 +24,8 @@ function getDefaultLogger(serviceName) {
       ms(),
       timestamp(),
       json(),
+      prettyPrint(),
+      errors({ stack: true }),
       // nodeEnv === 'dev' ? prettyPrint() : simple(),
       colorize({
         all: true,
@@ -29,16 +38,10 @@ function getDefaultLogger(serviceName) {
       }),
     );
 
-    fileFormat = combine(
-      errors({ stack: true }),
-      label({ label: serviceName }),
-      timestamp(),
-      json(),
-    );
+    fileFormat = combine(errors({ stack: true }), timestamp(), json());
   } else {
     fileFormat = combine(
       errors({ stack: true }),
-      label({ label: serviceName }),
       timestamp(),
       nestWinstonModuleUtilities.format.nestLike(serviceName, {
         colors: true,
@@ -48,6 +51,7 @@ function getDefaultLogger(serviceName) {
     consoleFormat = combine(
       timestamp(),
       ms(),
+      errors(),
       nestWinstonModuleUtilities.format.nestLike(serviceName, {
         colors: true,
         prettyPrint: true,
@@ -73,8 +77,15 @@ function getDefaultLogger(serviceName) {
 }
 
 class LoggerFactory {
-  static logger = getDefaultLogger('food-quest');
+  logger = getDefaultLogger('food-quest');
   serviceName = '';
+
+  getLogger(context?: string) {
+    // const reqContext = getNamespace(`${defaultConfig.APP_NAME}-req-context`);
+
+    // const curReq: Request = reqContext?.get('req-context');
+    return this.logger;
+  }
 }
 
 export { LoggerFactory };

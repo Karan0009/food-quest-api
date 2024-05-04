@@ -18,6 +18,7 @@ export class ConnectionFactory implements OnModuleDestroy {
                 database: config.database,
                 port: config.port,
                 username: config.username,
+                message: 'db connected',
               },
               'db',
             );
@@ -25,7 +26,24 @@ export class ConnectionFactory implements OnModuleDestroy {
           afterInit: () => {
             Logger.log('Sequelize started!', 'db');
           },
+          afterDisconnect: () => {
+            Logger.log(
+              {
+                message: 'db disconnected',
+              },
+              'db',
+            );
+          },
+          afterDestroy: () => {
+            Logger.log(
+              {
+                message: 'db destroyed',
+              },
+              'db',
+            );
+          },
         },
+        pool: { max: 2, min: 1 },
         benchmark: true,
         models: [join(__dirname, '../../', 'models')],
         define: {
@@ -34,11 +52,12 @@ export class ConnectionFactory implements OnModuleDestroy {
         },
         repositoryMode: true,
         logging: (query: string, timing: number): void => {
-          this.config.get('DEBUG') === 'true' &&
-            Logger.debug(`${query}, duration: ${timing}ms`, 'db', {
-              query: query,
-              duration: timing,
-            });
+          this.config.get('DEBUG') === 'true'
+            ? Logger.debug(`${query}, duration: ${timing}ms`, 'db', {
+                query: query,
+                duration: timing,
+              })
+            : Logger.log(`${query}, duration: ${timing}ms`, 'db');
         },
       });
       await this.connection.authenticate();

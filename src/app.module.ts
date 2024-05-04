@@ -1,15 +1,17 @@
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { EmailService } from './utils/email/email/email.service';
+import { EmailService } from './services/email/email/email.service';
 // import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
 import { UserModule } from './modules/user/user.module';
 import { CustomSequelizeModule } from './db/custom-sequelize/custom-sequelize.module';
 import { Module } from '@nestjs/common';
-import { JwtModule } from './utils/jwt/jwt.module';
+import { JwtModule } from './services/jwt/jwt.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { ConstantsModule } from './utils/constants/constants.module';
+import { ConstantsModule } from './services/constants/constants.module';
+import { UtilsModule } from './services/utils/utils.module';
+import { ContextMiddleware } from './core/context/context.middleware';
 
 @Module({
   imports: [
@@ -30,8 +32,9 @@ import { ConstantsModule } from './utils/constants/constants.module';
     }),
     ConstantsModule,
     CustomSequelizeModule,
+    UtilsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [AppService, EmailService, ContextMiddleware],
 })
 export class AppModule {}

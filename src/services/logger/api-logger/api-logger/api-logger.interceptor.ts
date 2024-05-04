@@ -7,7 +7,8 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Request, Response } from 'express';
-import { v1 as uuidv1 } from 'uuid';
+
+import { defaultConfig } from 'src/config/env';
 
 @Injectable()
 export class ApiLoggerInterceptor implements NestInterceptor {
@@ -16,34 +17,52 @@ export class ApiLoggerInterceptor implements NestInterceptor {
     const request = httpContext.getRequest<Request>();
     const response = httpContext.getResponse<Response>();
 
-    request.requestId = uuidv1();
+    request.ipAddr = request.ip.split(':').pop() || '';
+    // const reqContext = getNamespace(`${defaultConfig.APP_NAME}-req-context`)
+    // reqContext.run(() => {
+
+    //   reqContext.set('req-context', value);
+    // });
+
     const start = Date.now();
 
+    const { method, originalUrl, requestId, ipAddr, body, params, query } =
+      request;
+
+    const logMsg = {
+      ipAddr: ipAddr || 'UNKNOWN_IP',
+      method,
+      originalUrl,
+      body: body,
+      params: params,
+      message: 'REQ::START',
+      query: query,
+      requestId: requestId,
+    };
+
+    Logger.log(logMsg, defaultConfig.APP_NAME);
+
     response.on('finish', () => {
-      const { method, originalUrl } = request;
       const { statusCode } = response;
       const contentLength = response.get('content-length');
 
       const timeTaken = Date.now() - start;
-      request.ipAddr = request.ip.split(':').pop() || '';
-
-      // const logMsg = `[${
-      //   request.ipAddr || 'UNKNOWN_IP'
-      // }] [${method}] ${originalUrl} ${statusCode} ${contentLength} ${timeTaken}ms`;
       const logMsg = {
-        ipAddr: request.ipAddr || 'UNKNOWN_IP',
+        ipAddr: ipAddr || 'UNKNOWN_IP',
         method,
         originalUrl,
         statusCode,
         contentLength,
+        message: 'REQ::END',
         timeTaken: `${timeTaken}ms`,
-        requestId: request.requestId,
+        requestId: requestId,
+        // response: json.arguments[0][0],
       };
 
       if (statusCode < 400) {
-        Logger.log(logMsg);
+        Logger.log(logMsg, defaultConfig.APP_NAME);
       } else {
-        Logger.error(logMsg);
+        Logger.error(logMsg, defaultConfig.APP_NAME);
       }
     });
 
