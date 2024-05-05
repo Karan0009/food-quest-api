@@ -8,8 +8,6 @@ import {
 import { Observable } from 'rxjs';
 import { Request, Response } from 'express';
 
-import { defaultConfig } from 'src/config/env';
-
 @Injectable()
 export class ApiLoggerInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -17,30 +15,22 @@ export class ApiLoggerInterceptor implements NestInterceptor {
     const request = httpContext.getRequest<Request>();
     const response = httpContext.getResponse<Response>();
 
-    request.ipAddr = request.ip.split(':').pop() || '';
-    // const reqContext = getNamespace(`${defaultConfig.APP_NAME}-req-context`)
-    // reqContext.run(() => {
-
-    //   reqContext.set('req-context', value);
-    // });
-
+    // request.ipAddr = request.ip.split(':').pop() || '';
+    request.ipAddr = request.ip;
     const start = Date.now();
 
-    const { method, originalUrl, requestId, ipAddr, body, params, query } =
-      request;
+    const { method, ipAddr, body, params, query } = request;
 
     const logMsg = {
-      ipAddr: ipAddr || 'UNKNOWN_IP',
+      ip_addr: ipAddr || 'UNKNOWN_IP',
       method,
-      originalUrl,
       body: body,
       params: params,
       message: 'REQ::START',
       query: query,
-      requestId: requestId,
     };
 
-    Logger.log(logMsg, defaultConfig.APP_NAME);
+    Logger.log(logMsg, process.env.APP_NAME);
 
     response.on('finish', () => {
       const { statusCode } = response;
@@ -48,21 +38,19 @@ export class ApiLoggerInterceptor implements NestInterceptor {
 
       const timeTaken = Date.now() - start;
       const logMsg = {
-        ipAddr: ipAddr || 'UNKNOWN_IP',
+        ip_addr: ipAddr || 'UNKNOWN_IP',
         method,
-        originalUrl,
-        statusCode,
-        contentLength,
+        status_code: statusCode,
+        content_length: contentLength,
         message: 'REQ::END',
-        timeTaken: `${timeTaken}ms`,
-        requestId: requestId,
+        time_taken: `${timeTaken}ms`,
         // response: json.arguments[0][0],
       };
 
       if (statusCode < 400) {
-        Logger.log(logMsg, defaultConfig.APP_NAME);
+        Logger.log(logMsg, process.env.APP_NAME);
       } else {
-        Logger.error(logMsg, defaultConfig.APP_NAME);
+        Logger.error(logMsg, process.env.APP_NAME);
       }
     });
 

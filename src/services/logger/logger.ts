@@ -3,15 +3,18 @@ import {
   WinstonModule,
   utilities as nestWinstonModuleUtilities,
 } from 'nest-winston';
+import { getNamespace } from 'cls-hooked';
 
 const { combine, ms, timestamp, json, errors, colorize, prettyPrint } = format;
 
-// function requestIdFormatter(info: any, opts: { req?: Request }) {
-//   if (opts.req && opts.req.requestId) {
-//     info.requestId = opts.req.requestId;
-//   }
-//   return info;
-// }
+const ignorePrivate = format((info) => {
+  const reqContext = getNamespace(`${process.env.APP_NAME}-req-context`);
+  const session = reqContext?.get('req-context');
+  if (session) {
+    return { ...info, ...session };
+  }
+  return info;
+});
 
 function getDefaultLogger(serviceName) {
   let consoleFormat;
@@ -22,7 +25,8 @@ function getDefaultLogger(serviceName) {
   if (USE_JSON_LOGGER === 'true') {
     consoleFormat = combine(
       ms(),
-      timestamp(),
+      ignorePrivate(),
+      timestamp({ format: 'YYYY-MM-DD HH:mm:ss:sss:Z' }),
       json(),
       prettyPrint(),
       errors({ stack: true }),
@@ -80,10 +84,7 @@ class LoggerFactory {
   logger = getDefaultLogger('food-quest');
   serviceName = '';
 
-  getLogger(context?: string) {
-    // const reqContext = getNamespace(`${defaultConfig.APP_NAME}-req-context`);
-
-    // const curReq: Request = reqContext?.get('req-context');
+  getLogger() {
     return this.logger;
   }
 }

@@ -10,6 +10,7 @@ export class ConnectionFactory implements OnModuleDestroy {
   connection: Sequelize = undefined;
   async init() {
     try {
+      console.log(this.config.get('DB_URL'));
       this.connection = new Sequelize(this.config.get('DB_URL'), {
         hooks: {
           afterConnect: (config: Config) => {
