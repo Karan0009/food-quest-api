@@ -11,14 +11,11 @@ export default class User extends Model<User> {
   })
   id: string;
 
-  @Column({ field: 'username', type: DataType.STRING(50) })
-  username: string;
-
-  @Column({ field: 'email', type: DataType.STRING(50) })
-  email: string;
+  @Column({ field: 'phone_number', type: DataType.STRING(15) })
+  phoneNumber: string;
 
   @Column({
-    field: 'profile-picture',
+    field: 'profile_picture',
     type: DataType.STRING(200),
     defaultValue: '',
   })
