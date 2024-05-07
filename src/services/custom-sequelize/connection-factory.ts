@@ -74,7 +74,8 @@ export class ConnectionFactory implements OnModuleDestroy {
       };
       this.connection = new Sequelize(dbOptions);
       await this.connection.authenticate();
-      await this.connection.sync({ force: true, alter: true });
+      // TODO: disable this.connection.sync(); when deploying
+      await this.connection.sync();
       return this.connection;
     } catch (err) {
       throw err;

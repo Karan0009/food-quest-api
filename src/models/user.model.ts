@@ -1,7 +1,7 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import RefreshToken from './refresh-tokens.model';
 
-@Table
+@Table({ tableName: 'users' })
 export default class User extends Model<User> {
   @Column({
     field: 'id',
