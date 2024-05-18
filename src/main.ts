@@ -12,7 +12,7 @@ async function bootstrap() {
   });
   createNamespace(`${process.env.APP_NAME}-req-context`);
   // app.use(new ContextMiddleware().use);
-  app.useLogger(new LoggerFactory().getLogger());
+  app.useLogger(new LoggerFactory().logger);
   app.useGlobalInterceptors(new ApiLoggerInterceptor());
   app.use(compression());
   app.enableCors({

@@ -2,14 +2,16 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
-  Logger,
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Request, Response } from 'express';
+import { LoggerFactory } from '../../logger';
 
 @Injectable()
 export class ApiLoggerInterceptor implements NestInterceptor {
+  logger = new LoggerFactory().getLogger(process.env.APP_NAME);
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const httpContext = context.switchToHttp();
     const request = httpContext.getRequest<Request>();
@@ -30,7 +32,7 @@ export class ApiLoggerInterceptor implements NestInterceptor {
       query: query,
     };
 
-    Logger.log(logMsg, process.env.APP_NAME);
+    this.logger.info(logMsg);
 
     response.on('finish', () => {
       const { statusCode } = response;
@@ -48,9 +50,9 @@ export class ApiLoggerInterceptor implements NestInterceptor {
       };
 
       if (statusCode < 400) {
-        Logger.log(logMsg, process.env.APP_NAME);
+        this.logger.info(logMsg);
       } else {
-        Logger.error(logMsg, process.env.APP_NAME);
+        this.logger.error(logMsg);
       }
     });
 
