@@ -10,7 +10,7 @@ export default class Otp extends Model {
   })
   id: string;
 
-  @Column({ field: 'otp', type: DataType.STRING(6) })
+  @Column({ field: 'otp', type: DataType.STRING(6), allowNull: false })
   otp: string;
 
   @Column({

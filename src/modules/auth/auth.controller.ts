@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { GetOtpDto } from './dto/get-otp.dto';
 import { GetOtpEntity } from './entities/get-otp.entity';
 import { BaseEntity } from 'src/core/base/base.entity';
+import Otp from 'src/models/otp.model';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +16,11 @@ export class AuthController {
       // req.res.statusCode = 200;
 
       return new BaseEntity({
-        data: new GetOtpEntity({ phone: '23232' }),
+        data: new GetOtpEntity({
+          phone: body.phone,
+          country_code: body.country_code,
+          code: newOtp.toJSON<Otp>().id,
+        }),
         statusCode: HttpStatus.CREATED,
         message: 'otp created successfully',
       });
