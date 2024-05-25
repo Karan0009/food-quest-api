@@ -1,42 +1,26 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { GetOtpDto } from './dto/get-otp.dto';
+import { GetOtpEntity } from './entities/get-otp.entity';
+import { BaseEntity } from 'src/core/base/base.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
-  }
+  @Post('get-otp')
+  async getOtp(@Body() body: GetOtpDto) {
+    try {
+      const newOtp = await this.authService.createNewOtp();
+      // req.res.statusCode = 200;
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+      return new BaseEntity({
+        data: new GetOtpEntity({ phone: '23232' }),
+        statusCode: HttpStatus.CREATED,
+        message: 'otp created successfully',
+      });
+    } catch (err) {
+      throw err;
+    }
   }
 }

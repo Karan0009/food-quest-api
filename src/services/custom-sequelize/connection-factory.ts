@@ -1,10 +1,12 @@
-import { Logger, OnModuleDestroy } from '@nestjs/common';
+import { OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { Config } from 'sequelize';
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
+import { LoggerFactory } from '../logger/logger';
 
 export class ConnectionFactory implements OnModuleDestroy {
+  logger = new LoggerFactory().getLogger('db');
   constructor(private readonly config: ConfigService) {}
 
   connection: Sequelize = undefined;
@@ -25,7 +27,7 @@ export class ConnectionFactory implements OnModuleDestroy {
             : undefined,
         pool: { max: 2, min: 1 },
         benchmark: true,
-        repositoryMode: true,
+        repositoryMode: false,
         models: [join(__dirname, '../../', 'models')],
         define: {
           underscored: true,
@@ -33,49 +35,35 @@ export class ConnectionFactory implements OnModuleDestroy {
         },
         logging: (query: string, timing: number): void => {
           this.config.get('DEBUG') === 'true'
-            ? Logger.debug(`${query}, duration: ${timing}ms`, 'db', {
+            ? this.logger.debug(`${query}, duration: ${timing}ms`, 'db', {
                 query: query,
                 duration: timing,
               })
-            : Logger.log(`${query}, duration: ${timing}ms`, 'db');
+            : this.logger.info(`${query}, duration: ${timing}ms`, 'db');
         },
         hooks: {
           afterConnect: (config: Config) => {
-            Logger.log(
-              {
-                database: config.database,
-                port: config.port,
-                username: config.username,
-                message: 'db connected',
-              },
-              'db',
-            );
+            this.logger.info('db connected', {
+              database: config.database,
+              port: config.port,
+              username: config.username,
+            });
           },
           afterInit: () => {
-            Logger.log('Sequelize started!', 'db');
+            this.logger.info('Sequelize started!');
           },
           afterDisconnect: () => {
-            Logger.log(
-              {
-                message: 'db disconnected',
-              },
-              'db',
-            );
+            this.logger.info('db disconnected');
           },
           afterDestroy: () => {
-            Logger.log(
-              {
-                message: 'db destroyed',
-              },
-              'db',
-            );
+            this.logger.info('db destroyed');
           },
         },
       };
       this.connection = new Sequelize(dbOptions);
       await this.connection.authenticate();
       // TODO: disable this.connection.sync(); when deploying
-      await this.connection.sync();
+      // await this.connection.sync({ alter: true, force: true });
       return this.connection;
     } catch (err) {
       throw err;

@@ -17,26 +17,26 @@ export default class Otp extends Model {
     field: 'time_to_live_in_sec',
     type: DataType.INTEGER,
   })
-  timeToLiveInSec: number;
+  time_to_live_in_sec: number;
 
   @Column({
     field: 'is_used',
     type: DataType.BOOLEAN,
     defaultValue: false,
   })
-  isUsed: boolean;
+  is_used: boolean;
 
-  @Column({
-    field: 'created_at',
-    type: DataType.DATE,
-    defaultValue: DataType.NOW,
-  })
-  createdAt: Date;
+  // @Column({
+  //   field: 'created_at',
+  //   type: DataType.DATE,
+  //   defaultValue: DataType.NOW,
+  // })
+  // created_at: Date;
 
-  @Column({
-    field: 'updated_at',
-    type: DataType.DATE,
-    defaultValue: DataType.NOW,
-  })
-  updatedAt: Date;
+  // @Column({
+  //   field: 'updated_at',
+  //   type: DataType.DATE,
+  //   defaultValue: DataType.NOW,
+  // })
+  // updated_at: Date;
 }

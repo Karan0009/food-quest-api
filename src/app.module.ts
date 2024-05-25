@@ -11,6 +11,9 @@ import { join } from 'path';
 import { ConstantsModule } from './services/constants/constants.module';
 import { UtilsModule } from './services/utils/utils.module';
 import { ContextMiddleware } from './core/context/context.middleware';
+import { CachingModule } from './services/caching/caching.module';
+import { CryptoService } from './services/crypto/crypto.service';
+import { AuthModule } from './modules/auth/auth.module';
 
 const VALID_ENVS = ['dev', 'testing', 'production'];
 
@@ -31,6 +34,7 @@ function getEnvFilepath(nodeEnv?: string): string {
         cacheControl: true,
       },
     }),
+    AuthModule,
     UserModule,
     JwtModule,
     ConfigModule.forRoot({
@@ -41,9 +45,44 @@ function getEnvFilepath(nodeEnv?: string): string {
     ConstantsModule,
     CustomSequelizeModule,
     UtilsModule,
+    CachingModule,
+    // CacheModule.registerAsync({
+    //   isGlobal: true,
+    //   inject: [ConfigService],
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => {
+    //     const logger = new LoggerFactory().getLogger(
+    //       'redis-connection-factory',
+    //     );
+    //     try {
+    //       const store = await redisStore({
+    //         password: configService.get('REDIS_CACHE_PASSWORD'),
+    //         socket: {
+    //           host: configService.get('REDIS_CACHE_HOST'),
+    //           port: configService.get('REDIS_CACHE_PORT'),
+    //         },
+    //         ttl: 30 * 24 * 60 * 60 * 1000, // 1 day
+    //       });
+    //       logger.info('connected to redis server!');
+    //       return {
+    //         store,
+    //       };
+    //     } catch (err) {
+    //       logger.error('error while connecting to redis server', err);
+    //     }
+    //   },
+    // }),
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [
+    AppService,
+    EmailService,
+    CryptoService,
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: ClassSerializerInterceptor,
+    // },
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer): void {
