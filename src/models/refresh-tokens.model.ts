@@ -23,10 +23,13 @@ export default class RefreshToken extends Model<RefreshToken> {
 
   @ForeignKey(() => User)
   @Column({ field: 'user_id', type: DataType.UUID })
-  userId: string;
+  user_id: string;
+
+  @Column({ field: 'meta', type: DataType.JSON, defaultValue: {} })
+  meta: object;
 
   @Column({ field: 'expire_at', type: DataType.DATE })
-  expireAt: Date;
+  expire_at: string;
 
   @Column({ field: 'status', defaultValue: 'active' })
   status: string;
@@ -36,14 +39,14 @@ export default class RefreshToken extends Model<RefreshToken> {
     type: DataType.DATE,
     defaultValue: DataType.NOW,
   })
-  createdAt: Date;
+  created_at: Date;
 
   @Column({
     field: 'updated_at',
     type: DataType.DATE,
     defaultValue: DataType.NOW,
   })
-  updatedAt: Date;
+  updated_at: Date;
 
   @BelongsTo(() => User)
   user: User;

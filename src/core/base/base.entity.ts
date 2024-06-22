@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import { Expose } from 'class-transformer';
 
-export class BaseEntity {
+export default class BaseEntity {
   @Expose()
   data: object | null;
   @Expose()

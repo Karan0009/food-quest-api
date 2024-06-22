@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { randomInt } from 'node:crypto';
+import * as dayjs from 'dayjs';
+import * as utc from 'dayjs/plugin/utc';
+import * as timezone from 'dayjs/plugin/timezone';
 
 @Injectable()
 export class UtilsService {
@@ -12,27 +16,41 @@ export class UtilsService {
 
   generateRandomOtp(options: OtpOptions): string {
     try {
-      const numbers = '0123456789';
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-      let charsetToUse = numbers;
-      if (!options.onlyNumbers) {
-        charsetToUse += chars;
-      }
-      let otp = '';
+      const minLimit = parseInt(Array(options.length).fill(0).join(''));
+      const maxLimit = parseInt(Array(options.length).fill(9).join(''));
 
-      for (let i = 0; i < options.length; i++) {
-        const randomIndex = Math.floor(Math.random() * charsetToUse.length);
-        otp += charsetToUse[randomIndex];
-      }
+      const otp = randomInt(minLimit, maxLimit).toString();
 
       return otp;
     } catch (err) {
       throw err;
     }
   }
+
+  getDayJsObj(datetime?: string | number | dayjs.Dayjs | Date, tz = 'utc') {
+    try {
+      dayjs.extend(utc);
+      dayjs.extend(timezone);
+      return datetime ? dayjs(datetime).tz(tz) : dayjs().tz(tz);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  encodeToBase64(val) {
+    return Buffer.from(val).toString('base64');
+  }
+
+  decodeFromBase64(base64Str) {
+    try {
+      return Buffer.from(base64Str, 'base64').toString('ascii');
+    } catch (err) {
+      return null;
+    }
+  }
 }
 
 export interface OtpOptions {
   length: number;
-  onlyNumbers: boolean;
+  setDefaultOtp?: boolean;
 }

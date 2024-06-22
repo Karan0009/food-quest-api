@@ -5,6 +5,8 @@ import { ApiLoggerInterceptor } from './services/logger/api-logger/api-logger/ap
 import { LoggerFactory } from './services/logger/logger';
 import { createNamespace } from 'cls-hooked';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './core/error/http-exception.filter';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const port = process.env.PORT || 3000;
@@ -12,7 +14,10 @@ async function bootstrap() {
     bufferLogs: false,
   });
   createNamespace(`${process.env.APP_NAME}-req-context`);
+  app.setGlobalPrefix('/api');
   // app.use(new ContextMiddleware().use);
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.use(cookieParser());
   app.useLogger(new LoggerFactory().logger);
   app.useGlobalPipes(
     new ValidationPipe({

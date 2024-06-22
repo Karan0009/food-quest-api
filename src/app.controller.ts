@@ -1,22 +1,24 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Req } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Response } from 'express';
+import { Request } from 'express';
 import { LoggerFactory } from './services/logger/logger';
+import BaseEntity from './core/base/base.entity';
 
-@Controller()
+@Controller('v1')
 export class AppController {
   logger = new LoggerFactory().getLogger('app-controller');
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(@Res() res: Response) {
+  @Get('/ping')
+  getHello(@Req() req: Request) {
     try {
-      const someOtherData = { name: 'karan', age: '24' };
-      this.logger.info('hello', { someOtherData });
-      res.json({ data: 'hello' });
-      // return this.appService.getHello();
+      req.res.statusCode = HttpStatus.OK;
+      return new BaseEntity({
+        data: { data: 'pong' },
+        statusCode: HttpStatus.OK,
+        message: `here's your pong`,
+      });
     } catch (err) {
-      // Logger.error('error in getHello', err);
       throw err;
     }
   }

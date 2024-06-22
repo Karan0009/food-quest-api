@@ -20,6 +20,7 @@ import { CACHE_MANAGER } from 'src/core/constants';
         );
         try {
           const store = await redisStore({
+            username: configService.get('REDIS_CACHE_USERNAME'),
             password: configService.get('REDIS_CACHE_PASSWORD'),
             socket: {
               host: configService.get('REDIS_CACHE_HOST'),

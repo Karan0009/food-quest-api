@@ -2,6 +2,14 @@ import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 @Table
 export default class Otp extends Model {
+  async expireNow() {
+    try {
+      await this.update({ is_used: true });
+    } catch (err) {
+      throw err;
+    }
+  }
+
   @Column({
     field: 'id',
     type: DataType.UUID,
@@ -16,6 +24,7 @@ export default class Otp extends Model {
   @Column({
     field: 'time_to_live_in_sec',
     type: DataType.INTEGER,
+    allowNull: false,
   })
   time_to_live_in_sec: number;
 
@@ -26,17 +35,17 @@ export default class Otp extends Model {
   })
   is_used: boolean;
 
-  // @Column({
-  //   field: 'created_at',
-  //   type: DataType.DATE,
-  //   defaultValue: DataType.NOW,
-  // })
-  // created_at: Date;
+  @Column({
+    field: 'created_at',
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+  })
+  created_at: Date;
 
-  // @Column({
-  //   field: 'updated_at',
-  //   type: DataType.DATE,
-  //   defaultValue: DataType.NOW,
-  // })
-  // updated_at: Date;
+  @Column({
+    field: 'updated_at',
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+  })
+  updated_at: Date;
 }

@@ -14,9 +14,9 @@ const addRequestSessionData = format((info) => {
 });
 
 function getLoggerFormats() {
-  const DEBUG = process.env.DEBUG || 'false';
+  // const DEBUG = process.env.DEBUG || 'false';
   // const USE_JSON_LOGGER = process.env.USE_JSON_LOGGER || 'false';
-  const nodeEnv = process.env.NODE_ENV || 'production';
+  // const nodeEnv = process.env.NODE_ENV || 'production';
   // if (USE_JSON_LOGGER === 'true') {
   const consoleFormat = combine(
     ms(),
@@ -39,6 +39,7 @@ function getLoggerFormats() {
 
   const fileFormat = combine(
     errors({ stack: true }),
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss:sss:Z' }),
     addRequestSessionData(),
     timestamp(),
     json(),
@@ -92,6 +93,7 @@ function getNestTypeLogger() {
   const { consoleFormat, fileFormat } = getLoggerFormats();
   return WinstonModule.createLogger({
     level: DEBUG === 'true' ? 'debug' : 'info',
+
     transports: [
       new transports.Console({ format: consoleFormat }),
       new transports.File({

@@ -29,6 +29,7 @@ export class ConnectionFactory implements OnModuleDestroy {
         benchmark: true,
         repositoryMode: false,
         models: [join(__dirname, '../../', 'models')],
+        timezone: '+00:00',
         define: {
           underscored: true,
           timestamps: true,
@@ -63,7 +64,7 @@ export class ConnectionFactory implements OnModuleDestroy {
       this.connection = new Sequelize(dbOptions);
       await this.connection.authenticate();
       // TODO: disable this.connection.sync(); when deploying
-      // await this.connection.sync({ alter: true, force: true });
+      await this.connection.sync({ alter: true, force: true });
       return this.connection;
     } catch (err) {
       throw err;

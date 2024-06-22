@@ -3,6 +3,7 @@ services:
     build:
       context: .
     environment:
+      APP_ENV: production
       NODE_ENV: production
     env_file:
       - .env

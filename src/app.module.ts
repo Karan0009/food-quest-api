@@ -14,6 +14,10 @@ import { ContextMiddleware } from './core/context/context.middleware';
 import { CachingModule } from './services/caching/caching.module';
 import { CryptoService } from './services/crypto/crypto.service';
 import { AuthModule } from './modules/auth/auth.module';
+// import { SmsService } from './services/sms/sms.service';
+import { SmsModule } from './services/sms/sms.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './lib/guards/auth.guard';
 
 const VALID_ENVS = ['dev', 'testing', 'production'];
 
@@ -46,6 +50,7 @@ function getEnvFilepath(nodeEnv?: string): string {
     CustomSequelizeModule,
     UtilsModule,
     CachingModule,
+    SmsModule,
     // CacheModule.registerAsync({
     //   isGlobal: true,
     //   inject: [ConfigService],
@@ -74,10 +79,15 @@ function getEnvFilepath(nodeEnv?: string): string {
     // }),
   ],
   controllers: [AppController],
+
   providers: [
     AppService,
     EmailService,
     CryptoService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
     // {
     //   provide: APP_INTERCEPTOR,
     //   useClass: ClassSerializerInterceptor,
